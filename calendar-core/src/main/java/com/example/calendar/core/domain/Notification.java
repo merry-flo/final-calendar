@@ -1,18 +1,14 @@
 package com.example.calendar.core.domain;
 
 
-import java.time.LocalDateTime;
-import lombok.AccessLevel;
+import com.example.calendar.core.domain.entity.Schedule;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Notification {
+    private Schedule schedule;
 
-    private Long id;
-    private LocalDateTime notifyAt;
-    private String title;
-    private User writer;
-    private LocalDateTime createdAt;
+    public Notification(Schedule schedule) {
+        this.schedule = schedule;
+    }
 }
