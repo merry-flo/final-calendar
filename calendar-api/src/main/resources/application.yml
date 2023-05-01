@@ -1,7 +1,13 @@
 server:
   port: 8088
+  error:
+    include-stacktrace: never
+    whitelabel:
+      enabled: true
 
 spring:
+  profiles:
+    default: dev
 
   thymeleaf:
     cache: false

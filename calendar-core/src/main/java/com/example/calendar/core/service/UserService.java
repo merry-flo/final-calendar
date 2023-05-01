@@ -34,8 +34,15 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Optional<User> findUserByEmailAndPassword(String email, String password) {
         return userRepository.findByEmail(email)
                              .map(user -> user.isMatch(encryptor, password) ? user : null);
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserOrElseThrow(final Long userId) {
+        return userRepository.findById(userId)
+                             .orElseThrow(() -> new RuntimeException("user not found"));
     }
 }

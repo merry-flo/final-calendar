@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class SignUpReq {
-    private String email;
-    private String password;
-    private String name;
-    private LocalDate birth;
+    private final String email;
+    private final String password;
+    private final String name;
+    private final LocalDate birth;
 }
