@@ -24,7 +24,6 @@ public class User extends BaseEntity {
         this.name = name;
         this.birth = birth;
     }
-
     public boolean isMatch(Encryptor encryptor, String password) {
         return encryptor.isMatch(password, this.password);
     }
