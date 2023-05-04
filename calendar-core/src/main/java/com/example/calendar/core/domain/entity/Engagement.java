@@ -2,6 +2,9 @@ package com.example.calendar.core.domain.entity;
 
 import com.example.calendar.core.domain.Event;
 import com.example.calendar.core.domain.RequestStatus;
+import com.example.calendar.core.util.Period;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -39,5 +42,9 @@ public class Engagement extends BaseEntity {
 
     public Event getEvent() {
         return this.schedule.toEvent();
+    }
+
+    public boolean isOverlapped(Period period) {
+        return this.schedule.isOverlapped(period);
     }
 }

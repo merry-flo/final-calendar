@@ -2,6 +2,7 @@ package com.example.calendar.api.service;
 
 import com.example.calendar.api.dto.AuthUser;
 import com.example.calendar.api.dto.EventCreateReq;
+import com.example.calendar.core.domain.Event;
 import com.example.calendar.core.domain.RequestStatus;
 import com.example.calendar.core.domain.entity.Engagement;
 import com.example.calendar.core.domain.entity.Schedule;
@@ -9,6 +10,7 @@ import com.example.calendar.core.domain.entity.User;
 import com.example.calendar.core.domain.entity.repository.EngagementRepository;
 import com.example.calendar.core.domain.entity.repository.ScheduleRepository;
 import com.example.calendar.core.service.UserService;
+import com.example.calendar.core.util.Period;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,10 @@ public class EventService {
     public void createEvent(EventCreateReq eventCreateReq, AuthUser authUser) {
         final List<Engagement> engagements = engagementRepository.findAll();
 
-        if (engagements.stream().anyMatch(e ->
-            eventCreateReq.getAttendeeIds().contains(e.getAttendee().getId())
-                && e.getRequestStatus() == RequestStatus.ACCEPTED
-                && e.getEvent().isOverlapped(eventCreateReq.getStartAt(), eventCreateReq.getEndAt()))) {
+        Period period = Period.of(eventCreateReq.getStartAt(), eventCreateReq.getEndAt());
+        if (engagements.stream().anyMatch(e -> eventCreateReq.getAttendeeIds().contains(e.getAttendee().getId())
+            && e.getRequestStatus() == RequestStatus.ACCEPTED
+            && e.getSchedule().isOverlapped(period))) {
             throw new RuntimeException("can not create event because of overlapped event.");
         }
 

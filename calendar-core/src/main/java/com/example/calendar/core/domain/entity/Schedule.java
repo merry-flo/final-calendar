@@ -3,6 +3,8 @@ package com.example.calendar.core.domain.entity;
 import com.example.calendar.core.domain.Event;
 import com.example.calendar.core.domain.Notification;
 import com.example.calendar.core.domain.Task;
+import com.example.calendar.core.util.Period;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -86,5 +88,9 @@ public class Schedule extends BaseEntity{
 
     public Notification toNotification() {
         return new Notification(this);
+    }
+
+    public boolean isOverlapped(Period period) {
+        return period.isOverlapped(startAt, endAt);
     }
 }
