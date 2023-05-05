@@ -12,6 +12,7 @@ import com.example.calendar.api.service.TaskService;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -33,19 +34,19 @@ public class ScheduleApiController {
     private final NotificationService notificationService;
 
     @PostMapping("/tasks")
-    public ResponseEntity<Void> createTask(@RequestBody TaskCreateRequest request, AuthUser authUser) {
+    public ResponseEntity<Void> createTask(@RequestBody @Valid TaskCreateRequest request, AuthUser authUser) {
         taskService.createTask(request, authUser);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/events")
-    public ResponseEntity<Void> createEvents(@RequestBody EventCreateReq request, AuthUser authUser) {
+    public ResponseEntity<Void> createEvents(@RequestBody @Valid EventCreateReq request, AuthUser authUser) {
         eventService.createEvent(request, authUser);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/notifications")
-    public ResponseEntity<Void> createNotification(@RequestBody NotificationCreateReq request, AuthUser authUser) {
+    public ResponseEntity<Void> createNotification(@RequestBody @Valid NotificationCreateReq request, AuthUser authUser) {
         notificationService.createNotification(request, authUser);
         return ResponseEntity.ok().build();
     }

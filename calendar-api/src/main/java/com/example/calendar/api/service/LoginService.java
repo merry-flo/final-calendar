@@ -3,6 +3,8 @@ package com.example.calendar.api.service;
 import com.example.calendar.api.dto.LoginReq;
 import com.example.calendar.api.dto.SignUpReq;
 import com.example.calendar.core.domain.entity.User;
+import com.example.calendar.core.exception.CalendarException;
+import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.service.UserService;
 import java.util.Optional;
 import javax.servlet.http.HttpSession;
@@ -43,7 +45,7 @@ public class LoginService {
         if (userOptional.isPresent()) {
             session.setAttribute(LOGIN_USER_KEY, userOptional.get().getId());
         } else {
-            throw new RuntimeException("failed to login");
+            throw new CalendarException(ErrorCode.LOGIN_FAILURE);
         }
     }
 

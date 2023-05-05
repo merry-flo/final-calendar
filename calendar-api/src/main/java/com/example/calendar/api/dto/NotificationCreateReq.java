@@ -1,16 +1,23 @@
 package com.example.calendar.api.dto;
 
+import com.example.calendar.core.exception.CalendarException;
+import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.util.TimeUnit;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class NotificationCreateReq {
+    @NotBlank
     private final String title;
+
+    @NotNull
     private final LocalDateTime notifyAt;
     private final RepeatInfo repeatInfo;
 
@@ -32,7 +39,7 @@ public class NotificationCreateReq {
                                 case YEAR:
                                     return notifyAt.plusYears(increment);
                                 default:
-                                    throw new RuntimeException("bad request. not match time unit");
+                                    throw new CalendarException(ErrorCode.NOT_SUPPORTED_OPERATION);
                             }
                         })
                         .collect(Collectors.toList());

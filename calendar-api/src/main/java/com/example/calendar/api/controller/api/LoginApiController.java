@@ -4,6 +4,7 @@ import com.example.calendar.api.dto.LoginReq;
 import com.example.calendar.api.dto.SignUpReq;
 import com.example.calendar.api.service.LoginService;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,13 +18,13 @@ public class LoginApiController {
     private final LoginService loginService;
 
     @PostMapping("/api/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody SignUpReq req, HttpSession session) {
+    public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpReq req, HttpSession session) {
         loginService.signUp(req, session);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<Void> login(@RequestBody LoginReq req, HttpSession session) {
+    public ResponseEntity<Void> login(@RequestBody @Valid LoginReq req, HttpSession session) {
         loginService.login(req, session);
         return ResponseEntity.ok().build();
     }

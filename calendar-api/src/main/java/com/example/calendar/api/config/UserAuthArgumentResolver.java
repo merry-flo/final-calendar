@@ -2,6 +2,8 @@ package com.example.calendar.api.config;
 
 import com.example.calendar.api.dto.AuthUser;
 import com.example.calendar.api.service.LoginService;
+import com.example.calendar.core.exception.CalendarException;
+import com.example.calendar.core.exception.ErrorCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -20,7 +22,7 @@ public class UserAuthArgumentResolver implements HandlerMethodArgumentResolver {
         NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         Long userId = (Long) webRequest.getAttribute(LoginService.LOGIN_USER_KEY, NativeWebRequest.SCOPE_SESSION);
         if (userId == null) {
-            throw new RuntimeException("bad request. no session");
+            throw new CalendarException(ErrorCode.NO_SESSION);
         }
         return AuthUser.of(userId);
     }

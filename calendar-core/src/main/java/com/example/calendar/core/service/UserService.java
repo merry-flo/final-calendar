@@ -2,6 +2,8 @@ package com.example.calendar.core.service;
 
 import com.example.calendar.core.domain.entity.User;
 import com.example.calendar.core.domain.entity.repository.UserRepository;
+import com.example.calendar.core.exception.CalendarException;
+import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.dto.SignUpReq;
 import com.example.calendar.core.util.Encryptor;
 import java.util.Optional;
@@ -20,7 +22,7 @@ public class UserService {
     public User create(SignUpReq signUpReq) {
         userRepository.findByEmail(signUpReq.getEmail())
                 .ifPresent(user -> {
-                    throw new RuntimeException("user already exists");
+                    throw new CalendarException(ErrorCode.USER_ALREADY_EXIST);
                 });
 
 
@@ -43,6 +45,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserOrElseThrow(final Long userId) {
         return userRepository.findById(userId)
-                             .orElseThrow(() -> new RuntimeException("user not found"));
+                             .orElseThrow(() -> new CalendarException(ErrorCode.USER_NOT_FOUND));
     }
 }
