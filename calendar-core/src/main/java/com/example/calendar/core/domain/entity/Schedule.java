@@ -93,4 +93,8 @@ public class Schedule extends BaseEntity{
     public boolean isOverlapped(Period period) {
         return period.isOverlapped(startAt, endAt);
     }
+
+    public Period getPeriod() {
+        return Period.of(startAt, endAt);
+    }
 }

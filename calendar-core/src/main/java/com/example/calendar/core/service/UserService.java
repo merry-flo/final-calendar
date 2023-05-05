@@ -6,6 +6,7 @@ import com.example.calendar.core.exception.CalendarException;
 import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.dto.SignUpReq;
 import com.example.calendar.core.util.Encryptor;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,10 @@ public class UserService {
     public User findUserOrElseThrow(final Long userId) {
         return userRepository.findById(userId)
                              .orElseThrow(() -> new CalendarException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findAllUserByUserIds(List<Long> attendeeIds) {
+        return userRepository.findAllById(attendeeIds);
     }
 }

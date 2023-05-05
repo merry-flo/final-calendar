@@ -1,8 +1,10 @@
 package com.example.calendar.api.service;
 
 import com.example.calendar.api.dto.AuthUser;
+import com.example.calendar.api.dto.EngagementMailDto;
 import com.example.calendar.api.dto.EventCreateReq;
 import com.example.calendar.core.domain.RequestStatus;
+import com.example.calendar.core.domain.entity.BaseEntity;
 import com.example.calendar.core.domain.entity.Engagement;
 import com.example.calendar.core.domain.entity.Schedule;
 import com.example.calendar.core.domain.entity.User;
@@ -13,6 +15,8 @@ import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.service.UserService;
 import com.example.calendar.core.util.Period;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,26 +41,33 @@ public class EventService {
             throw new CalendarException(ErrorCode.SCHEDULE_OVERLAPPED);
         }
 
+        User from = userService.findUserOrElseThrow(authUser.getUserId());
         final Schedule event = Schedule.event(
             eventCreateReq.getStartAt(),
             eventCreateReq.getEndAt(),
             eventCreateReq.getTitle(),
             eventCreateReq.getDescription(),
-            userService.findUserOrElseThrow(authUser.getUserId())
+            from
         );
 
         scheduleRepository.save(event);
 
-        eventCreateReq.getAttendeeIds().forEach(attendeeId -> {
-            final User user = userService.findUserOrElseThrow(attendeeId);
+        List<User> attendees = userService.findAllUserByUserIds(eventCreateReq.getAttendeeIds());
+
+        Set<String> toList = attendees.stream().map(User::getEmail).collect(Collectors.toSet());
+
+        attendees.stream().forEach(attendee -> {
             final Engagement engagement = Engagement.builder()
                                          .schedule(event)
-                                         .attendee(user)
+                                         .attendee(attendee)
                                          .requestStatus(RequestStatus.REQUESTED)
                                          .build();
 
             engagementRepository.save(engagement);
-            emailService.sendEngagement(engagement);
+
+            emailService.sendEngagement(
+                new EngagementMailDto(engagement.getId(), from.getEmail(), attendee.getEmail(), toList,
+                    event.getTitle(), event.getPeriod()));
         });
     }
 }

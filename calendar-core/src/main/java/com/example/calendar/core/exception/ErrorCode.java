@@ -21,6 +21,8 @@ public enum ErrorCode {
 
     INTERNAL_SERVER_ERROR("Internal server error."),
 
+    BAD_REQUEST("Bad request."),
+
     ;
 
     private final String defaultMessage;

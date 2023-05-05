@@ -1,6 +1,7 @@
 package com.example.calendar.core.domain.entity;
 
 import com.example.calendar.core.domain.Event;
+import com.example.calendar.core.domain.RequestReplyType;
 import com.example.calendar.core.domain.RequestStatus;
 import com.example.calendar.core.util.Period;
 import java.time.LocalDate;
@@ -46,5 +47,18 @@ public class Engagement extends BaseEntity {
 
     public boolean isOverlapped(Period period) {
         return this.schedule.isOverlapped(period);
+    }
+
+    public void updateRequestStatus(RequestReplyType type) {
+        switch (type) {
+            case ACCEPT:
+                this.requestStatus = RequestStatus.ACCEPTED;
+                break;
+            case REJECT:
+                this.requestStatus = RequestStatus.REJECTED;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid reply type");
+        }
     }
 }

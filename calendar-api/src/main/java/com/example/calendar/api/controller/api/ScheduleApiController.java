@@ -3,8 +3,10 @@ package com.example.calendar.api.controller.api;
 import com.example.calendar.api.dto.AuthUser;
 import com.example.calendar.api.dto.EventCreateReq;
 import com.example.calendar.api.dto.NotificationCreateReq;
+import com.example.calendar.api.dto.ReplyEngagementReq;
 import com.example.calendar.api.dto.ScheduleDto;
 import com.example.calendar.api.dto.TaskCreateRequest;
+import com.example.calendar.api.service.EngagementService;
 import com.example.calendar.api.service.EventService;
 import com.example.calendar.api.service.NotificationService;
 import com.example.calendar.api.service.ScheduleQueryService;
@@ -18,7 +20,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +36,7 @@ public class ScheduleApiController {
     private final TaskService taskService;
     private final EventService eventService;
     private final NotificationService notificationService;
+    private final EngagementService engagementService;
 
     @PostMapping("/tasks")
     public ResponseEntity<Void> createTask(@RequestBody @Valid TaskCreateRequest request, AuthUser authUser) {
@@ -90,5 +95,12 @@ public class ScheduleApiController {
         return ResponseEntity.ok(schedules);
     }
 
+    @PutMapping("/events/engagements/{engagementId}")
+    public ResponseEntity<Void> updateEngagement(
+        @RequestBody @Valid ReplyEngagementReq req,
+        @PathVariable Long engagementId, AuthUser authUser) {
+        engagementService.update(req.getType(), engagementId, authUser);
+        return ResponseEntity.ok().build();
+    }
 
 }

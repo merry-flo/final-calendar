@@ -16,6 +16,7 @@ public abstract class ErrorCodeHttpStatusMapper {
             case SCHEDULE_OVERLAPPED:
             case NOT_SUPPORTED_OPERATION:
             case VALIDATION_FAILURE:
+            case BAD_REQUEST:
                 return HttpStatus.BAD_REQUEST;
 
             case INTERNAL_SERVER_ERROR:

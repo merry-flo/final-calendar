@@ -1,8 +1,8 @@
 package com.example.calendar.api.service;
 
-import com.example.calendar.core.domain.entity.Engagement;
+import com.example.calendar.api.dto.EngagementMailDto;
 
 public interface EmailService {
 
-    void sendEngagement(Engagement engagement);
+    void sendEngagement(EngagementMailDto engagementMailDto);
 }
