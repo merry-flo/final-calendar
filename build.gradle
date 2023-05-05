@@ -43,3 +43,9 @@ project(':calendar-batch') {
         implementation project(':calendar-core')
     }
 }
+
+project(':calendar-core-test') {
+    dependencies {
+        implementation project(':calendar-core')
+    }
+}
