@@ -1,6 +1,7 @@
 package com.example.calendar.api.service;
 
 import com.example.calendar.api.dto.EngagementMailDto;
+import com.example.calendar.api.dto.SendMailBatchReq;
 import com.example.calendar.core.domain.RequestReplyType;
 import java.util.Locale;
 import java.util.Map;
@@ -43,5 +44,10 @@ public class GoogleEmailService implements EmailService {
                     )
                 ), true);
         });
+    }
+
+    @Override
+    public void sendAlarmMail(SendMailBatchReq req) {
+
     }
 }

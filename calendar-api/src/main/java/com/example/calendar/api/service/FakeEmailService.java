@@ -1,6 +1,7 @@
 package com.example.calendar.api.service;
 
 import com.example.calendar.api.dto.EngagementMailDto;
+import com.example.calendar.api.dto.SendMailBatchReq;
 import com.example.calendar.core.domain.entity.Engagement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -14,5 +15,10 @@ public class FakeEmailService implements EmailService{
     @Override
     public void sendEngagement(EngagementMailDto engagementMailDto) {
         log.info("Send email to {}", engagementMailDto.toString());
+    }
+
+    @Override
+    public void sendAlarmMail(SendMailBatchReq req) {
+        log.info("Send alarm email to {}", req.toString());
     }
 }
