@@ -8,14 +8,37 @@ spring:
     jdbc:
       initialize-schema: never
 
+  main:
+    web-application-type: none
+
+---
+spring:
+  config:
+    active:
+      on-profile: dev
+
   datasource:
     url: jdbc:mysql://localhost:3306/calendar_db?useSSL=false&serverTimezone=UTC
     username: root
     password: ''
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  main:
-    web-application-type: none
+logging:
+  level:
+    org:
+      springframework:
+        jdbc: TRACE
+        transaction: DEBUG
+        batch: DEBUG
+
+---
+spring:
+  config:
+    active:
+      on-profile: test
+
+  jpa:
+    database: h2
 
 logging:
   level:

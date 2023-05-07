@@ -1,7 +1,5 @@
 package com.example.calendar.batch.job;
 
-import com.example.calendar.core.domain.entity.Engagement;
-import com.example.calendar.core.domain.entity.Schedule;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
