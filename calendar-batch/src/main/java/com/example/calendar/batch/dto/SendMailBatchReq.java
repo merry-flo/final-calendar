@@ -1,4 +1,4 @@
-package com.example.calendar.batch.job;
+package com.example.calendar.batch.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

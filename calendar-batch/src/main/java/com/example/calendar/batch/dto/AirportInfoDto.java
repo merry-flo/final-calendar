@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AirportInfoDto {
+    private Long id;
     private String airportNameEn;
     private String airportNameKo;
     private String iataCode;

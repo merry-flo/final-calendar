@@ -1,5 +1,6 @@
 package com.example.calendar.batch.job;
 
+import com.example.calendar.batch.dto.SendMailBatchReq;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
