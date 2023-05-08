@@ -3,4 +3,5 @@ include 'calendar-core'
 include 'calendar-api'
 include 'calendar-batch'
 include 'calendar-core-test'
+include 'house-batch'
 
