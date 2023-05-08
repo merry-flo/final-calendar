@@ -1,19 +1,19 @@
 package com.example.house.batch.domain;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
-@DynamicUpdate
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Lawd extends BaseTimeEntity{
+public class Lawd {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,26 +24,8 @@ public class Lawd extends BaseTimeEntity{
     @Column(length = 100)
     private String lawdProvince;
 
-    private Boolean exist;
-
-    public Lawd(String lawdCode, String lawdProvince, Boolean exist) {
-        this.lawdCode = lawdCode;
-        this.lawdProvince = lawdProvince;
-        this.exist = exist;
-    }
-
-    @Override
-    public String toString() {
-        return "Lawd{" + "lawdId=" + lawdId
-            + ", lawdCode='" + lawdCode + '\''
-            + ", lawdProvince='" + lawdProvince + '\''
-            + ", exist=" + exist
-            + '}';
-    }
-
-    public void update(String lawdCode, String lawdProvince, Boolean exist) {
-        this.lawdCode = lawdCode;
-        this.lawdProvince = lawdProvince;
-        this.exist = exist;
-    }
+    private boolean exist;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

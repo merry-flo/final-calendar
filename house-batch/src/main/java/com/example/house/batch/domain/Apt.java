@@ -1,6 +1,6 @@
 package com.example.house.batch.domain;
 
-import com.example.house.batch.dto.AptDealDto;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Apt extends BaseTimeEntity {
+public class Apt {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aptId;
@@ -31,15 +31,8 @@ public class Apt extends BaseTimeEntity {
     private String lawdProvinceCode;
 
     private Integer builtYear;
-
-    public static Apt of(AptDealDto dto) {
-        Apt apt = new Apt();
-        apt.aptName = dto.getAptName();
-        apt.address = dto.getAddress();
-        apt.province = dto.getProvince();
-        apt.lawdProvinceCode = dto.getLawdProvinceCode().strip();
-        apt.builtYear = dto.getBuiltYear();
-        return apt;
-    }
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

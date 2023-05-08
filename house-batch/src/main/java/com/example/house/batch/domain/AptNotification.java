@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,12 +19,11 @@ import lombok.NoArgsConstructor;
     )
 })
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class AptNotification extends BaseTimeEntity {
+public class AptNotification {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aptNotificationId;
 
     private String email;
@@ -35,10 +33,7 @@ public class AptNotification extends BaseTimeEntity {
 
     private boolean enabled;
 
-    @Builder
-    public AptNotification(String email, String lawdProvinceCode, boolean enabled) {
-        this.email = email;
-        this.lawdProvinceCode = lawdProvinceCode;
-        this.enabled = enabled;
-    }
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
