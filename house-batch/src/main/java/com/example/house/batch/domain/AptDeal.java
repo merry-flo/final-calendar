@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class AptDeal {
+public class AptDeal extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aptDealId;
@@ -26,7 +26,4 @@ public class AptDeal {
     private Integer floor;
     private boolean dealCanceled;
     private LocalDate dealCanceledDate;
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
