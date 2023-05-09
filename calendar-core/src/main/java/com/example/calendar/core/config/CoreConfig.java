@@ -1,4 +1,4 @@
-package com.example.calendar.core.domain.config;
+package com.example.calendar.core.config;
 
 import com.example.calendar.core.util.BCryptEncryptor;
 import com.example.calendar.core.util.Encryptor;
