@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(
-    classes = {LawdService.class, LawdInsertJobConfig.class, HouseBatchTestConfig.class, JpaRepositoriesAutoConfiguration.class})
+    classes = {LawdService.class, LawdInsertJobConfig.class, HouseBatchTestConfig.class})
 @SpringBatchTest
 @ActiveProfiles("test")
 class LawdInsertJobConfigTest {
