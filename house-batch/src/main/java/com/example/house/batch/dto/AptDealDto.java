@@ -1,13 +1,14 @@
 package com.example.house.batch.dto;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 @ToString
-@Getter
 @XmlRootElement(name = "item")
 public class AptDealDto {
 
@@ -49,4 +50,59 @@ public class AptDealDto {
 
     @XmlElement(name = "해제여부")
     private String dealCanceled;
+
+    public String getAptName() {
+        return nullSafeValue(this.aptName);
+    }
+
+    public String getAddress() {
+        return nullSafeValue(this.address);
+    }
+
+    public String getProvince() {
+        return nullSafeValue(this.province);
+    }
+
+    public String getLawdProvinceCode() {
+        return nullSafeValue(this.lawdProvinceCode);
+    }
+
+    public Integer getBuiltYear() {
+        return this.builtYear;
+    }
+
+    private String nullSafeValue(String value) {
+        return Objects.requireNonNullElseGet(value, () -> "")
+                      .strip();
+    }
+
+    public Double getExclusiveArea() {
+        return this.exclusiveArea;
+    }
+
+    public Long getDealAmount() {
+        return Long.parseLong(
+            nullSafeValue(this.dealAmount)
+                .replace(",", ""));
+    }
+
+    public Integer getFloor() {
+        return this.floor;
+    }
+
+    public boolean getDealCanceled() {
+        return "O".equals(nullSafeValue(this.dealCanceled));
+    }
+
+    public LocalDate getDealCanceledDate() {
+        return StringUtils.hasText(this.dealCanceledDate)
+            ? LocalDate.parse(
+            nullSafeValue(this.dealCanceledDate),
+            DateTimeFormatter.ofPattern("yy.MM.dd")) : null;
+    }
+
+    public LocalDate getDealDate() {
+        return LocalDate.of(this.year, this.month, this.day);
+    }
+
 }

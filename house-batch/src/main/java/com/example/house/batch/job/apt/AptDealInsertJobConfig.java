@@ -5,20 +5,20 @@ import com.example.house.batch.domain.repository.LawdRepository;
 import com.example.house.batch.dto.AptDealDto;
 import com.example.house.batch.job.validator.LawdCodeParameterValidator;
 import com.example.house.batch.job.validator.YearMonthParameterValidator;
+import com.example.house.batch.service.AptService;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
@@ -26,6 +26,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 @Slf4j
@@ -36,20 +38,21 @@ public class AptDealInsertJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final ApartmentApiResource apartmentApiResource;
-    private final LawdRepository lawdRepository;
+    private final AptService aptService;
 
     public static final String JOB_NAME = "aptDealInsertJob";
 
     @Bean
     public Job aptDealInsertJob(
         Step lawdProvinceCodeStep,
-        Step executionContextPrintStep
+        Step aptDealInsertStep
     ) {
         return jobBuilderFactory.get(JOB_NAME)
                                 .incrementer(new RunIdIncrementer())
                                 .start(lawdProvinceCodeStep)
-                                .next(executionContextPrintStep)
-//                                .validator(aptDealJobParameterValidator())
+                                .on("CONTINUABLE").to(aptDealInsertStep).next(lawdProvinceCodeStep)
+                                .on("*").end()
+                                .end()
                                 .build();
     }
 
@@ -63,31 +66,44 @@ public class AptDealInsertJobConfig {
 
     @JobScope
     @Bean
-    public Step lawdProvinceCodeStep() {
+    public Step lawdProvinceCodeStep(
+        @Value("#{jobParameters['version']}") Long version,
+        Tasklet lawdProvinceCodeTasklet
+    ) {
         return stepBuilderFactory.get("lawdProvinceCodeStep")
-                                 .tasklet((contribution, chunkContext) -> {
-                                     StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
-                                     ExecutionContext executionContext = stepExecution.getJobExecution()
-                                                                                      .getExecutionContext();
-                                     List<String> lawdProvinceCode = lawdRepository.findAllDistinctLawdProvinceCode();
-
-                                     executionContext.put("lawdProvinceCode", String.join(",", lawdProvinceCode));
-                                     return RepeatStatus.FINISHED;
-                                 })
+                                 .tasklet(lawdProvinceCodeTasklet)
                                  .build();
+    }
+
+    @StepScope
+    @Bean
+    public Tasklet lawdProvinceCodeTasklet(LawdRepository lawdRepository) {
+        return new LawdProvinceCodeTasklet(lawdRepository);
     }
 
     @JobScope
     @Bean
     public Step executionContextPrintStep(
-        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
+        Tasklet executionContextPrintTasklet
     ) {
         return stepBuilderFactory.get("executionContextPrintStep")
-                                 .tasklet((contribution, chunkContext) -> {
-                                     System.out.println("lawdProvinceCode = " + lawdProvinceCode);
-                                     return RepeatStatus.FINISHED;
-                                 })
+                                 .tasklet(executionContextPrintTasklet)
                                  .build();
+    }
+
+    /*
+        JobExecutionContext 를 JobScope 의 Step 에서 가지고 오는 경우
+        최초에 Step 이 초기화 될때 값이 할당되고 그 이후에는 값이 변경되지 않는다.
+     */
+    @StepScope
+    @Bean
+    public Tasklet executionContextPrintTasklet(
+        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
+    ) {
+        return (contribution, chunkContext) -> {
+            System.out.println("lawdProvinceCode = " + lawdProvinceCode);
+            return RepeatStatus.FINISHED;
+        };
     }
 
 
@@ -104,17 +120,34 @@ public class AptDealInsertJobConfig {
                                  .build();
     }
 
-
+    @Profile("!test")
     @StepScope
     @Bean
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
         @Value("#{jobParameters['yearMonth']}") String yearMonth,
-        @Value("#{jobParameters['lawdCode']}") String lawdCode,
+        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode,
         Jaxb2Marshaller aptDealDtoMarshaller
     ) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
             .name("aptDealResourceReader")
-            .resource(apartmentApiResource.getResource(lawdCode, YearMonth.parse(yearMonth)))
+            .resource(apartmentApiResource.getResource(
+                lawdProvinceCode,
+                YearMonth.parse(yearMonth)))
+            .addFragmentRootElements("item")
+            .unmarshaller(aptDealDtoMarshaller)
+            .build();
+    }
+
+    @Profile("test")
+    @StepScope
+    @Bean
+    public StaxEventItemReader<AptDealDto> aptDealResourceReader(
+        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode,
+        Jaxb2Marshaller aptDealDtoMarshaller
+    ) {
+        return new StaxEventItemReaderBuilder<AptDealDto>()
+            .name("aptDealResourceReader")
+            .resource(new ClassPathResource("apartment_api_response.xml"))
             .addFragmentRootElements("item")
             .unmarshaller(aptDealDtoMarshaller)
             .build();
@@ -131,7 +164,7 @@ public class AptDealInsertJobConfig {
     public ItemWriter<AptDealDto> aptDealItemWriter() {
         return items -> {
             for (AptDealDto item : items) {
-                log.info("item: {}", item);
+                aptService.upsert(item);
             }
         };
     }

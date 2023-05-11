@@ -1,6 +1,6 @@
 package com.example.house.batch.domain;
 
-import java.time.LocalDateTime;
+import com.example.house.batch.dto.AptDealDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,5 +31,15 @@ public class Apt extends BaseTimeEntity {
     private String lawdProvinceCode;
 
     private Integer builtYear;
+
+    public static Apt of(AptDealDto dto) {
+        Apt apt = new Apt();
+        apt.aptName = dto.getAptName();
+        apt.address = dto.getAddress();
+        apt.province = dto.getProvince();
+        apt.lawdProvinceCode = dto.getLawdProvinceCode().strip();
+        apt.builtYear = dto.getBuiltYear();
+        return apt;
+    }
 
 }
