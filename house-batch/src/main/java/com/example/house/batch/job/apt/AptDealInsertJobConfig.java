@@ -42,6 +42,9 @@ public class AptDealInsertJobConfig {
 
     public static final String JOB_NAME = "aptDealInsertJob";
 
+    /*
+        conditional step flow 를 활용해 step 의 반복적인 처리
+     */
     @Bean
     public Job aptDealInsertJob(
         Step lawdProvinceCodeStep,
@@ -56,20 +59,9 @@ public class AptDealInsertJobConfig {
                                 .build();
     }
 
-    private CompositeJobParametersValidator aptDealJobParameterValidator() {
-        return new CompositeJobParametersValidator() {{
-            setValidators(
-                List.of(new YearMonthParameterValidator(), new LawdCodeParameterValidator())
-            );
-        }};
-    }
-
     @JobScope
     @Bean
-    public Step lawdProvinceCodeStep(
-        @Value("#{jobParameters['version']}") Long version,
-        Tasklet lawdProvinceCodeTasklet
-    ) {
+    public Step lawdProvinceCodeStep(Tasklet lawdProvinceCodeTasklet) {
         return stepBuilderFactory.get("lawdProvinceCodeStep")
                                  .tasklet(lawdProvinceCodeTasklet)
                                  .build();
@@ -79,31 +71,6 @@ public class AptDealInsertJobConfig {
     @Bean
     public Tasklet lawdProvinceCodeTasklet(LawdRepository lawdRepository) {
         return new LawdProvinceCodeTasklet(lawdRepository);
-    }
-
-    @JobScope
-    @Bean
-    public Step executionContextPrintStep(
-        Tasklet executionContextPrintTasklet
-    ) {
-        return stepBuilderFactory.get("executionContextPrintStep")
-                                 .tasklet(executionContextPrintTasklet)
-                                 .build();
-    }
-
-    /*
-        JobExecutionContext 를 JobScope 의 Step 에서 가지고 오는 경우
-        최초에 Step 이 초기화 될때 값이 할당되고 그 이후에는 값이 변경되지 않는다.
-     */
-    @StepScope
-    @Bean
-    public Tasklet executionContextPrintTasklet(
-        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
-    ) {
-        return (contribution, chunkContext) -> {
-            System.out.println("lawdProvinceCode = " + lawdProvinceCode);
-            return RepeatStatus.FINISHED;
-        };
     }
 
 
@@ -130,12 +97,22 @@ public class AptDealInsertJobConfig {
     ) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
             .name("aptDealResourceReader")
-            .resource(apartmentApiResource.getResource(
-                lawdProvinceCode,
-                YearMonth.parse(yearMonth)))
+            .resource(apartmentApiResource.getResource(lawdProvinceCode, YearMonth.parse(yearMonth)))
             .addFragmentRootElements("item")
             .unmarshaller(aptDealDtoMarshaller)
             .build();
+    }
+
+    @Bean
+    public ItemWriter<AptDealDto> aptDealItemWriter() {
+        return items -> items.forEach(aptService::upsert);
+    }
+
+    @Bean
+    public Jaxb2Marshaller aptDealDtoMarshaller() {
+        return new Jaxb2Marshaller() {{
+            setClassesToBeBound(AptDealDto.class);
+        }};
     }
 
     @Profile("test")
@@ -153,19 +130,42 @@ public class AptDealInsertJobConfig {
             .build();
     }
 
+
+    @Profile("test")
+    @JobScope
     @Bean
-    public Jaxb2Marshaller aptDealDtoMarshaller() {
-        return new Jaxb2Marshaller() {{
-            setClassesToBeBound(AptDealDto.class);
+    public Step executionContextPrintStep(
+        Tasklet executionContextPrintTasklet
+    ) {
+        return stepBuilderFactory.get("executionContextPrintStep")
+                                 .tasklet(executionContextPrintTasklet)
+                                 .build();
+    }
+
+
+    /*
+    JobExecutionContext 를 JobScope 의 Step 에서 가지고 오는 경우
+    최초에 Step 이 초기화 될때 값이 할당되고 그 이후에는 값이 변경되지 않는다.
+    */
+
+    @Profile("test")
+    @StepScope
+    @Bean
+    public Tasklet executionContextPrintTasklet(
+        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
+    ) {
+        return (contribution, chunkContext) -> {
+            System.out.println("lawdProvinceCode = " + lawdProvinceCode);
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    private CompositeJobParametersValidator aptDealJobParameterValidator() {
+        return new CompositeJobParametersValidator() {{
+            setValidators(
+                List.of(new YearMonthParameterValidator(), new LawdCodeParameterValidator())
+            );
         }};
     }
 
-    @Bean
-    public ItemWriter<AptDealDto> aptDealItemWriter() {
-        return items -> {
-            for (AptDealDto item : items) {
-                aptService.upsert(item);
-            }
-        };
-    }
 }

@@ -5,6 +5,10 @@ import com.example.house.batch.domain.AptDeal;
 import com.example.house.batch.domain.repository.AptDealRepository;
 import com.example.house.batch.domain.repository.AptRepository;
 import com.example.house.batch.dto.AptDealDto;
+import com.example.house.batch.dto.AptDto;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class AptService {
+
     private final AptRepository aptRepository;
     private final AptDealRepository aptDealRepository;
 
@@ -31,5 +36,17 @@ public class AptService {
         aptDeal.map(apt);
         aptDeal.update(dto.getDealCanceled(), dto.getDealCanceledDate());
         aptDealRepository.save(aptDeal);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AptDto> findAptInfo(String lawdProvinceCode, LocalDate dealDate) {
+        return aptDealRepository.findAllByApt_LawdProvinceCodeAndDealCanceledIsFalseAndDealDate(lawdProvinceCode,
+                                    dealDate)
+                                .stream()
+                                .map(aptDeal ->
+                                    new AptDto(aptDeal.getApt().getAptName(), aptDeal.getDealAmount(),
+                                        aptDeal.getApt().getBuiltYear(),
+                                        aptDeal.getExclusiveArea()))
+                                .collect(Collectors.toUnmodifiableList());
     }
 }

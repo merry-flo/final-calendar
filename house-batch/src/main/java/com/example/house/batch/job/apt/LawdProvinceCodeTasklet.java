@@ -21,12 +21,12 @@ public class LawdProvinceCodeTasklet implements Tasklet {
     private final LawdRepository lawdRepository;
 
     private List<String> lawdProvinceCodeList;
-    private int lawdProvinceCodeCount;
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         ExecutionContext executionContext = getExecutionContext(chunkContext);
         initializeLawdProvinceCodeList(executionContext);
-        lawdProvinceCodeCount = executionContext.getInt(LAWD_PROVINCE_CODE_COUNT);
+        int lawdProvinceCodeCount = executionContext.getInt(LAWD_PROVINCE_CODE_COUNT);
 
         if (lawdProvinceCodeCount == 0) {
             contribution.setExitStatus(ExitStatus.COMPLETED);
