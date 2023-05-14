@@ -52,6 +52,7 @@ public class AptDealInsertJobConfig {
     ) {
         return jobBuilderFactory.get(JOB_NAME)
                                 .incrementer(new RunIdIncrementer())
+                                .validator(new YearMonthParameterValidator())
                                 .start(lawdProvinceCodeStep)
                                 .on("CONTINUABLE").to(aptDealInsertStep).next(lawdProvinceCodeStep)
                                 .on("*").end()
@@ -87,7 +88,6 @@ public class AptDealInsertJobConfig {
                                  .build();
     }
 
-    @Profile("!test")
     @StepScope
     @Bean
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
@@ -115,50 +115,50 @@ public class AptDealInsertJobConfig {
         }};
     }
 
-    @Profile("test")
-    @StepScope
-    @Bean
-    public StaxEventItemReader<AptDealDto> aptDealResourceReader(
-        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode,
-        Jaxb2Marshaller aptDealDtoMarshaller
-    ) {
-        return new StaxEventItemReaderBuilder<AptDealDto>()
-            .name("aptDealResourceReader")
-            .resource(new ClassPathResource("apartment_api_response.xml"))
-            .addFragmentRootElements("item")
-            .unmarshaller(aptDealDtoMarshaller)
-            .build();
-    }
-
-
-    @Profile("test")
-    @JobScope
-    @Bean
-    public Step executionContextPrintStep(
-        Tasklet executionContextPrintTasklet
-    ) {
-        return stepBuilderFactory.get("executionContextPrintStep")
-                                 .tasklet(executionContextPrintTasklet)
-                                 .build();
-    }
-
-
-    /*
-    JobExecutionContext 를 JobScope 의 Step 에서 가지고 오는 경우
-    최초에 Step 이 초기화 될때 값이 할당되고 그 이후에는 값이 변경되지 않는다.
-    */
-
-    @Profile("test")
-    @StepScope
-    @Bean
-    public Tasklet executionContextPrintTasklet(
-        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
-    ) {
-        return (contribution, chunkContext) -> {
-            System.out.println("lawdProvinceCode = " + lawdProvinceCode);
-            return RepeatStatus.FINISHED;
-        };
-    }
+//    @Profile("test")
+//    @StepScope
+//    @Bean
+//    public StaxEventItemReader<AptDealDto> aptDealResourceReader(
+//        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode,
+//        Jaxb2Marshaller aptDealDtoMarshaller
+//    ) {
+//        return new StaxEventItemReaderBuilder<AptDealDto>()
+//            .name("aptDealResourceReader")
+//            .resource(new ClassPathResource("apartment_api_response.xml"))
+//            .addFragmentRootElements("item")
+//            .unmarshaller(aptDealDtoMarshaller)
+//            .build();
+//    }
+//
+//
+//    @Profile("test")
+//    @JobScope
+//    @Bean
+//    public Step executionContextPrintStep(
+//        Tasklet executionContextPrintTasklet
+//    ) {
+//        return stepBuilderFactory.get("executionContextPrintStep")
+//                                 .tasklet(executionContextPrintTasklet)
+//                                 .build();
+//    }
+//
+//
+//    /*
+//    JobExecutionContext 를 JobScope 의 Step 에서 가지고 오는 경우
+//    최초에 Step 이 초기화 될때 값이 할당되고 그 이후에는 값이 변경되지 않는다.
+//    */
+//
+//    @Profile("test")
+//    @StepScope
+//    @Bean
+//    public Tasklet executionContextPrintTasklet(
+//        @Value("#{jobExecutionContext['lawdProvinceCode']}") String lawdProvinceCode
+//    ) {
+//        return (contribution, chunkContext) -> {
+//            System.out.println("lawdProvinceCode = " + lawdProvinceCode);
+//            return RepeatStatus.FINISHED;
+//        };
+//    }
 
     private CompositeJobParametersValidator aptDealJobParameterValidator() {
         return new CompositeJobParametersValidator() {{

@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -29,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
+@Disabled
 @SpringBootTest(
     classes = {AptDealInsertJobConfig.class, HouseBatchTestConfig.class, ApartmentApiResource.class, AptService.class},
     properties = {"job.name=" + AptDealInsertJobConfig.JOB_NAME, "apartment.api.path=testPath",

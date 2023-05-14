@@ -7,6 +7,7 @@ import com.example.house.batch.dto.AptDto;
 import com.example.house.batch.dto.AptNotificationDto;
 import com.example.house.batch.job.validator.RequestDateParameterValidator;
 import com.example.house.batch.service.AptService;
+import com.example.house.batch.service.NotificationService;
 import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -35,14 +36,14 @@ public class AptNotificationJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final LawdRepository lawdRepository;
     private final AptService aptService;
-
+    private final NotificationService notificationService;
 
     @Bean
     public Job aptNotificationJob(Step aptNotificationStep) {
         return jobBuilderFactory.get(APT_NOTIFICATION_JOB_NAME)
                                 .incrementer(new RunIdIncrementer())
-                                .start(aptNotificationStep)
                                 .validator(new RequestDateParameterValidator())
+                                .start(aptNotificationStep)
                                 .build();
     }
 
@@ -91,7 +92,7 @@ public class AptNotificationJobConfig {
 
     @Bean
     public ItemWriter<AptNotificationDto> aptNotificationItemWriter() {
-        return items -> items.stream().map(AptNotificationDto::toMessage).forEach(System.out::println);
+        return items -> items.stream().map(AptNotificationDto::toMessage)
+                             .forEach(notificationService::send);
     }
-
 }
