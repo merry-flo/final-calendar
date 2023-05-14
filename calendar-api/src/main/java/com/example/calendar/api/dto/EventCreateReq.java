@@ -2,6 +2,7 @@ package com.example.calendar.api.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,5 +18,5 @@ public class EventCreateReq {
     @NotNull
     private final LocalDateTime endAt;
 
-    private final List<Long> attendeeIds;
+    private final Set<Long> attendeeIds;
 }

@@ -76,6 +76,7 @@ public class SendEmailAlarmJobConfig {
                 + " where s.start_at >= now() + interval 10 minute\n"
                 + "  and s.start_at < now() + interval 11 minute;")
             .name("sendScheduleAlarmReader")
+            .fetchSize(CHUNK_SIZE)
             .build();
     }
 
@@ -92,6 +93,7 @@ public class SendEmailAlarmJobConfig {
                 + "  and s.start_at < now() + interval 11 minute\n"
                 + " and e.request_status = 'ACCEPTED';")
             .name("sendEngagementAlarmReader")
+            .fetchSize(CHUNK_SIZE)
             .build();
     }
 

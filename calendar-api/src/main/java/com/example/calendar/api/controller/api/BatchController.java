@@ -1,7 +1,7 @@
 package com.example.calendar.api.controller.api;
 
 import com.example.calendar.api.dto.SendMailBatchReq;
-import com.example.calendar.api.service.EmailService;
+import com.example.calendar.api.service.EmailSender;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BatchController {
 
-    private final EmailService emailService;
+    private final EmailSender emailSender;
 
     @PostMapping("/api/batch/mail")
     public ResponseEntity<Void> sendMail(@RequestBody List<SendMailBatchReq> reqs) {
-        reqs.forEach(r -> emailService.sendAlarmMail(r));
+        reqs.forEach(r -> emailSender.sendAlarmMail(r));
         return ResponseEntity.ok().build();
     }
 }

@@ -8,6 +8,7 @@ import com.example.calendar.core.dto.SignUpReq;
 import com.example.calendar.core.util.Encryptor;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findAllUserByUserIds(List<Long> attendeeIds) {
+    public List<User> findAllUserByUserIds(Set<Long> attendeeIds) {
         return userRepository.findAllById(attendeeIds);
     }
 }
