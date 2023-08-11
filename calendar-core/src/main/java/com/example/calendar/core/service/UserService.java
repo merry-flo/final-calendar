@@ -6,9 +6,11 @@ import com.example.calendar.core.exception.CalendarException;
 import com.example.calendar.core.exception.ErrorCode;
 import com.example.calendar.core.dto.SignUpReq;
 import com.example.calendar.core.util.Encryptor;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,25 +31,25 @@ public class UserService {
 
 
         return userRepository.save(
-            new User(
-                signUpReq.getEmail(),
-                encryptor.encrypt(signUpReq.getPassword()),
-                signUpReq.getName(),
-                signUpReq.getBirth()
-            )
+                new User(
+                        signUpReq.getEmail(),
+                        encryptor.encrypt(signUpReq.getPassword()),
+                        signUpReq.getName(),
+                        signUpReq.getBirth()
+                )
         );
     }
 
     @Transactional(readOnly = true)
     public Optional<User> findUserByEmailAndPassword(String email, String password) {
         return userRepository.findByEmail(email)
-                             .map(user -> user.isMatch(encryptor, password) ? user : null);
+                .map(user -> user.isMatch(encryptor, password) ? user : null);
     }
 
     @Transactional(readOnly = true)
     public User findUserOrElseThrow(final Long userId) {
         return userRepository.findById(userId)
-                             .orElseThrow(() -> new CalendarException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CalendarException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
