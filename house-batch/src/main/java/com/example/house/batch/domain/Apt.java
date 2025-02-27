@@ -33,6 +33,9 @@ public class Apt extends BaseTimeEntity {
     @Column(length = 5)
     private String lawdProvinceCode;
 
+    @Column(length = 5)
+    private String lawdProvinceCode66;
+
     private Integer builtYear;
 
     public static Apt of(AptDealDto dto) {
