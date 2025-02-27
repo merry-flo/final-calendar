@@ -27,6 +27,9 @@ public class Apt extends BaseTimeEntity {
     @Column(length = 40)
     private String province;
 
+    @Column(length = 40)
+    private String province22;
+
     @Column(length = 5)
     private String lawdProvinceCode;
 
